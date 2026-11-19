@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FreshFlow Sales Analysis - Final Report</title>
+<style>
+body{font-family:Arial,sans-serif;line-height:1.55;color:#243047;background:#f4f7fb;margin:0}
+main{max-width:1050px;margin:30px auto;background:white;padding:38px;border-radius:12px}
+header{background:#172554;color:white;padding:32px;border-radius:10px;margin-bottom:28px}
+h1{margin:0 0 8px;font-size:30px} h2{color:#1e3a8a;border-bottom:2px solid #dbeafe;padding-bottom:7px;margin-top:30px}
+h3{color:#334155} .muted{color:#64748b} .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:#eff6ff;padding:16px;border-radius:8px} .metric{font-size:22px;font-weight:bold;color:#1e40af}
+.table-wrap{overflow-x:auto} table{border-collapse:collapse;width:100%;margin:12px 0 20px;font-size:14px}
+th,td{border:1px solid #dbe2ea;padding:9px;text-align:left} th{background:#eaf1fb}
+.note{background:#fff7ed;border-left:4px solid #f59e0b;padding:12px 15px}
+footer{margin-top:35px;color:#64748b;font-size:12px;border-top:1px solid #e2e8f0;padding-top:14px}
+@media print{body{background:white}main{margin:0;padding:15px;box-shadow:none}}
+</style>
+</head>
+<body><main>
+<header>
+<p>PYTHON DATA ANALYSIS PROJECT</p>
+<h1>FreshFlow Sales Analysis</h1>
+<p>Final Project Report | 30-Day Transaction Analysis</p>
+<p class="muted" style="color:#cbd5e1">Generated automatically from the supplied FreshFlow sales CSV</p>
+</header>
+
+<h2>1. Executive Summary</h2>
+<p>This report presents a numerical analysis of FreshFlow sales transactions using Python and NumPy.
+It reviews data quality, financial performance, outlet and product performance, daily revenue,
+statistical anomalies and fixed-discount scenarios. The raw input data is preserved; a separate
+analytical dataset is created after applying the documented validation rules.</p>
+<div class="cards">
+<div class="card"><div class="muted">Input transactions</div><div class="metric">5,000</div></div>
+<div class="card"><div class="muted">Rows retained</div><div class="metric">4,963</div></div>
+<div class="card"><div class="muted">Net revenue</div><div class="metric">₹2,153,030.88</div></div>
+<div class="card"><div class="muted">Gross profit</div><div class="metric">₹1,094,037.21</div></div>
+<div class="card"><div class="muted">Gross margin</div><div class="metric">50.81%</div></div>
+</div>
+
+<h2>2. Introduction</h2>
+<p>FreshFlow sales analysis is designed to understand transaction-level business performance.
+The analysis uses the 12 numeric fields specified in the project dataset: transaction ID, day,
+outlet, product, category, quantity, unit price, unit cost, discount rate, stock before sale,
+payment code and customer rating.</p>
+
+<h2>3. Objectives</h2>
+<ul>S
+<li>Load and inspect the sales dataset using Python.</li>
+<li>Identify missing, invalid, duplicated and inconsistent records.</li>
+<li>Calculate sales, discounts, revenue, cost of goods sold and gross profit.</li>
+<li>Compare outlets and products using revenue, profit and units sold.</li>
+<li>Study daily revenue changes and detect unusual transaction values.</li>
+<li>Compare fixed 10% and 20% discount scenarios with the observed results.</li>
+</ul>
+
+<h2>4. Dataset Overview</h2>
+<p><b>Rows:</b> 5,000 &nbsp; <b>Columns:</b> 12 &nbsp;
+<b>Data type:</b> numeric array &nbsp; <b>Observation period:</b> days 1–30 (as defined by the project).</p>
+<p><b>Missing values by column:</b></p>
+<div class='table-wrap'><table><thead><tr><th>Column</th><th>Missing values</th></tr></thead><tbody><tr><td>transaction_id</td><td>0</td></tr><tr><td>day_index</td><td>0</td></tr><tr><td>outlet_id</td><td>0</td></tr><tr><td>product_code</td><td>0</td></tr><tr><td>category_code</td><td>0</td></tr><tr><td>quantity</td><td>0</td></tr><tr><td>unit_price</td><td>4</td></tr><tr><td>unit_cost</td><td>4</td></tr><tr><td>discount_rate</td><td>0</td></tr><tr><td>stock_before_units</td><td>0</td></tr><tr><td>payment_code</td><td>0</td></tr><tr><td>customer_rating</td><td>20</td></tr></tbody></table></div>
+
+<h2>5. Data Quality Audit</h2>
+<p>Each validation rule is counted separately. Issue counts may overlap because one transaction can violate more than one rule.</p>
+<div class='table-wrap'><table><thead><tr><th>Validation check</th><th>Flagged rows</th></tr></thead><tbody><tr><td>Invalid transaction ID</td><td>0</td></tr><tr><td>Rows involved in duplicate transaction IDs</td><td>10</td></tr><tr><td>Invalid day index</td><td>0</td></tr><tr><td>Invalid outlet code</td><td>2</td></tr><tr><td>Invalid product code</td><td>0</td></tr><tr><td>Invalid category code</td><td>0</td></tr><tr><td>Product-category mismatch</td><td>4</td></tr><tr><td>Invalid payment code</td><td>0</td></tr><tr><td>Invalid quantity</td><td>4</td></tr><tr><td>Missing or invalid unit price</td><td>6</td></tr><tr><td>Missing or invalid unit cost</td><td>6</td></tr><tr><td>Invalid discount rate</td><td>2</td></tr><tr><td>Missing or negative stock value</td><td>0</td></tr><tr><td>Invalid customer rating</td><td>3</td></tr><tr><td>Missing customer ratings (allowed)</td><td>20</td></tr></tbody></table></div>
+<p><b>Unique duplicate transaction IDs:</b> 5.
+<b>Rows involved in duplicate IDs:</b> 10.
+<b>Rows excluded from the initial analytical view:</b> 37.</p>
+<p>Rows with missing customer ratings are reported but are not excluded solely for that reason.
+Duplicate IDs are excluded from the initial analysis pending manual review. The original array remains unchanged.</p>
+
+<h2>6. Financial Performance</h2>
+<p>Gross sales = quantity × unit price. Discount amount = gross sales × discount rate.
+Net revenue = gross sales − discount amount. COGS = quantity × unit cost.
+Gross profit = net revenue − COGS.</p>
+<div class='table-wrap'><table><thead><tr><th>Financial measure</th><th>Result</th></tr></thead><tbody><tr><td>Gross sales</td><td>₹2,405,909.59</td></tr><tr><td>Discount amount</td><td>₹252,878.71</td></tr><tr><td>Net revenue</td><td>₹2,153,030.88</td></tr><tr><td>Cost of goods sold (COGS)</td><td>₹1,058,993.67</td></tr><tr><td>Gross profit</td><td>₹1,094,037.21</td></tr><tr><td>Overall gross margin</td><td>50.81%</td></tr></tbody></table></div>
+<p>Gross margin is calculated as gross profit divided by net revenue, multiplied by 100.</p>
+
+<h2>7. Outlet Performance</h2>
+<div class='table-wrap'><table><thead><tr><th>Outlet</th><th>Transactions</th><th>Net revenue</th><th>Gross profit</th><th>Units sold</th></tr></thead><tbody><tr><td>1</td><td>1859</td><td>₹791,612.39</td><td>₹403,256.35</td><td>8,272.00</td></tr><tr><td>2</td><td>1704</td><td>₹763,960.11</td><td>₹387,868.60</td><td>7,717.00</td></tr><tr><td>3</td><td>1400</td><td>₹597,458.38</td><td>₹302,912.26</td><td>6,386.00</td></tr></tbody></table></div>
+<p>Highest net revenue: <b>Outlet 1</b>.
+Highest gross profit: <b>Outlet 1</b>.</p>
+
+<h2>8. Product Performance</h2>
+<div class='table-wrap'><table><thead><tr><th>Product</th><th>Transactions</th><th>Net revenue</th><th>Gross profit</th><th>Units sold</th></tr></thead><tbody><tr><td>1</td><td>848</td><td>₹306,061.62</td><td>₹161,439.87</td><td>3,816.00</td></tr><tr><td>2</td><td>766</td><td>₹378,104.28</td><td>₹192,740.29</td><td>3,491.00</td></tr><tr><td>3</td><td>583</td><td>₹267,837.68</td><td>₹139,426.86</td><td>2,701.00</td></tr><tr><td>4</td><td>623</td><td>₹208,181.30</td><td>₹115,640.57</td><td>2,726.00</td></tr><tr><td>5</td><td>590</td><td>₹357,032.19</td><td>₹166,852.69</td><td>2,628.00</td></tr><tr><td>6</td><td>513</td><td>₹379,689.15</td><td>₹165,941.15</td><td>2,355.00</td></tr><tr><td>7</td><td>608</td><td>₹136,502.58</td><td>₹83,226.65</td><td>2,745.00</td></tr><tr><td>8</td><td>432</td><td>₹119,622.08</td><td>₹68,769.13</td><td>1,913.00</td></tr></tbody></table></div>
+<p>Highest net revenue: <b>Product 6</b>.
+Highest gross profit: <b>Product 2</b>.
+Highest units sold: <b>Product 1</b>.</p>
+<p>Sales volume and profitability are different measures; the highest-volume product is not necessarily the highest-profit product.</p>
+
+<h2>9. Daily Sales Trend</h2>
+<p>Highest revenue day: <b>Day 4</b> (₹85,045.66).
+Lowest revenue day: <b>Day 3</b> (₹55,241.78).
+A seven-day moving average was calculated to smooth short-term fluctuations.</p>
+<div class='table-wrap'><table><thead><tr><th>Day</th><th>Net revenue</th><th>Change from previous day</th><th>Percentage change</th></tr></thead><tbody><tr><td>1</td><td>₹83,667.60</td><td>—</td><td>—</td></tr><tr><td>2</td><td>₹64,264.78</td><td>₹-19,402.82</td><td>-23.19%</td></tr><tr><td>3</td><td>₹55,241.78</td><td>₹-9,023.00</td><td>-14.04%</td></tr><tr><td>4</td><td>₹85,045.66</td><td>₹29,803.87</td><td>53.95%</td></tr><tr><td>5</td><td>₹71,634.02</td><td>₹-13,411.64</td><td>-15.77%</td></tr><tr><td>6</td><td>₹84,840.51</td><td>₹13,206.49</td><td>18.44%</td></tr><tr><td>7</td><td>₹82,589.38</td><td>₹-2,251.14</td><td>-2.65%</td></tr><tr><td>8</td><td>₹67,075.07</td><td>₹-15,514.31</td><td>-18.78%</td></tr><tr><td>9</td><td>₹77,057.84</td><td>₹9,982.77</td><td>14.88%</td></tr><tr><td>10</td><td>₹70,358.24</td><td>₹-6,699.60</td><td>-8.69%</td></tr><tr><td>11</td><td>₹81,229.69</td><td>₹10,871.44</td><td>15.45%</td></tr><tr><td>12</td><td>₹63,516.71</td><td>₹-17,712.97</td><td>-21.81%</td></tr><tr><td>13</td><td>₹74,578.86</td><td>₹11,062.14</td><td>17.42%</td></tr><tr><td>14</td><td>₹69,837.43</td><td>₹-4,741.42</td><td>-6.36%</td></tr><tr><td>15</td><td>₹71,543.89</td><td>₹1,706.46</td><td>2.44%</td></tr><tr><td>16</td><td>₹74,918.04</td><td>₹3,374.15</td><td>4.72%</td></tr><tr><td>17</td><td>₹80,978.55</td><td>₹6,060.51</td><td>8.09%</td></tr><tr><td>18</td><td>₹74,912.37</td><td>₹-6,066.18</td><td>-7.49%</td></tr><tr><td>19</td><td>₹61,069.80</td><td>₹-13,842.57</td><td>-18.48%</td></tr><tr><td>20</td><td>₹72,083.65</td><td>₹11,013.85</td><td>18.03%</td></tr><tr><td>21</td><td>₹74,326.11</td><td>₹2,242.46</td><td>3.11%</td></tr><tr><td>22</td><td>₹69,347.95</td><td>₹-4,978.17</td><td>-6.70%</td></tr><tr><td>23</td><td>₹62,130.56</td><td>₹-7,217.39</td><td>-10.41%</td></tr><tr><td>24</td><td>₹70,206.63</td><td>₹8,076.08</td><td>13.00%</td></tr><tr><td>25</td><td>₹73,356.76</td><td>₹3,150.12</td><td>4.49%</td></tr><tr><td>26</td><td>₹66,163.49</td><td>₹-7,193.27</td><td>-9.81%</td></tr><tr><td>27</td><td>₹61,069.89</td><td>₹-5,093.60</td><td>-7.70%</td></tr><tr><td>28</td><td>₹62,555.40</td><td>₹1,485.50</td><td>2.43%</td></tr><tr><td>29</td><td>₹69,064.39</td><td>₹6,508.99</td><td>10.41%</td></tr><tr><td>30</td><td>₹78,365.83</td><td>₹9,301.44</td><td>13.47%</td></tr></tbody></table></div>
+
+<h2>10. Anomaly Detection</h2>
+<p>Transactions are flagged when net revenue, unit price or discount rate falls outside the IQR
+limits, or when transaction net revenue has an absolute z-score above 3.</p>
+<div class='table-wrap'><table><thead><tr><th>Measure</th><th>Lower IQR limit</th><th>Upper IQR limit</th></tr></thead><tbody><tr><td>Net revenue</td><td>-371.76</td><td>1,179.43</td></tr><tr><td>Unit price</td><td>15.67</td><td>193.10</td></tr><tr><td>Discount rate</td><td>-0.10</td><td>0.30</td></tr></tbody></table></div>
+<p><b>Transactions flagged for review:</b> 149.
+These records are not automatically deleted. Statistical unusualness does not prove an error.</p>
+<p>Transaction IDs flagged: 100036, 100097, 100114, 100146, 100167, 100171, 100238, 100251, 100283, 100289, 100395, 100425, 100484, 100503, 100508, 100513, 100562, 100686, 100687, 100694, 100735, 100761, 100771, 100899, 100914, 100955, 100966, 101015, 101048, 101050, 101052, 101135, 101203, 101249, 101257, 101326, 101413, 101426, 101466, 101468, 101481, 101579, 101615, 101616, 101660, 101687, 101691, 101796, 101850, 101873, 101916, 101944, 101949, 101992, 102017, 102022, 102038, 102061, 102069, 102079, 102133, 102139, 102143, 102224, 102291, 102350, 102356, 102380, 102459, 102461, 102477, 102550, 102565, 102669, 102680, 102684, 102694, 102737, 102758, 102810, 102819, 102835, 102869, 102901, 102912, 102997, 103037, 103040, 103064, 103090, 103159, 103165, 103172, 103175, 103221, 103262, 103268, 103378, 103429, 103450, 103463, 103500, 103631, 103673, 103681, 103720, 103745, 103775, 103863, 103875, 103894, 103922, 103954, 103989, 104069, 104073, 104129, 104175, 104237, 104240, 104250, 104259, 104290, 104339, 104391, 104400, 104411, 104438, 104445, 104531, 104539, 104622, 104627, 104689, 104696, 104700, 104752, 104755, 104765, 104766, 104794, 104799, 104851, 104854, 104874, 104875, 104916, 104923, 104992.</p>
+
+<h2>11. Discount and Relationship Analysis</h2>
+<p>Correlation between discount rate and quantity: <b>-0.0001</b>.
+Correlation between discount rate and gross margin: <b>-0.6202</b>.
+Correlation describes association and does not establish causation.</p>
+
+<h2>12. Discount Scenarios</h2>
+<p>The scenarios apply one fixed discount rate to the same quantities and costs. They do not estimate how customer demand would change.</p>
+<div class='table-wrap'><table><thead><tr><th>Scenario</th><th>Scenario revenue</th><th>Scenario gross profit</th><th>Revenue change vs actual</th><th>Profit change vs actual</th></tr></thead><tbody><tr><td>10%</td><td>₹2,165,318.63</td><td>₹1,106,324.96</td><td>₹12,287.75</td><td>₹12,287.75</td></tr><tr><td>20%</td><td>₹1,924,727.67</td><td>₹865,734.00</td><td>₹-228,303.21</td><td>₹-228,303.21</td></tr></tbody></table></div>
+
+<h2>13. Business Recommendations</h2>
+<ol><li>Review the operating practices of Outlet 1, which recorded the highest net revenue in the retained dataset. Compare staffing, product mix and operating processes with the other outlets.</li><li>Prioritise a margin and cost review for Product 2, the highest gross-profit product. Check whether its pricing, availability and promotion strategy can be maintained.</li><li>Investigate Day 4 and Day 3, the highest- and lowest-revenue days respectively. Compare transaction counts, product mix and discount levels before changing staffing or replenishment plans.</li></ol>
+<p>Management should assign an owner to each action, monitor net revenue and gross profit, and review results in the next reporting cycle.</p>
+
+<h2>14. Conclusion</h2>
+<p>The analysis provides a structured view of FreshFlow's recorded sales performance and the quality
+of the available transaction data. The financial, outlet, product and daily summaries can support
+further business review. Decisions should be based on both revenue and gross profit rather than
+sales volume alone.</p>
+
+<h2>15. Limitations</h2>
+<ul>
+<li>The analysis covers only the supplied 30-day transaction window and cannot establish annual seasonality.</li>
+<li>Gross profit is not net profit because rent, payroll and other operating expenses are not included.</li>
+<li>Discount scenarios hold quantity and unit cost constant and do not estimate customer demand response.</li>
+<li>Correlation does not prove a causal relationship.</li>
+<li>Transaction data alone cannot establish inventory waste or stock-flow reconciliation. A daily inventory companion file is required.</li>
+<li>Flagged outliers require human investigation and should not be treated as confirmed errors.</li>
+</ul>
+<div class="note"><b>Important:</b> This report is based on the CSV supplied when the script is run.
+Review flagged data-quality issues and anomaly transactions before using the results for operational decisions.</div>
+
+<footer>FreshFlow Sales Analysis | Prepared using Python and NumPy | Generated report</footer>
+</main></body></html>

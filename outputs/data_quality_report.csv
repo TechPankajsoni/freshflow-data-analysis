@@ -1,0 +1,16 @@
+issue,flagged_rows
+Invalid transaction ID,0
+Rows involved in duplicate transaction IDs,10
+Invalid day index,0
+Invalid outlet code,2
+Invalid product code,0
+Invalid category code,0
+Product-category mismatch,4
+Invalid payment code,0
+Invalid quantity,4
+Missing or invalid unit price,6
+Missing or invalid unit cost,6
+Invalid discount rate,2
+Missing or negative stock value,0
+Invalid customer rating,3
+Missing customer ratings (allowed),20
